@@ -110,16 +110,20 @@ def ganadorAnterior():
         etiqueta_ganador.config(text="Estás en el inicio de la lista")
         etiqueta_regalo.config(text="")
 
+def salir():
+    root.destroy()
+
 # Crear la interfaz gráfica
 root = tk.Tk()
 root.title("Rifa Navideña de HLS Group")
+root.attributes('-fullscreen',True)
 
 def mostrarLabelCarga():
     labelCargaLeyenda = tk.Label(root, text="Escogiendo Ganadores...", font=("Helvetica", 20,),bg="#192440", fg="white")
-    labelCargaLeyenda.pack(pady=20)
+    labelCargaLeyenda.pack(pady=5)
     
     labelCarga = tk.Label(root, text="", font=("Helvetica", 20,),bg="#192440", fg="white")
-    labelCarga.pack(pady=20)
+    labelCarga.pack(pady=5)
     
     # Lista de nombres para mostrar
     nombres = resultado['NombreTrabajador'].tolist()
@@ -146,23 +150,25 @@ root.configure(bg="#192440")
 # Cargar el logo
 logo_path = "logo.png"
 logo_image = Image.open(logo_path)
-logo_image = logo_image.resize((400, 400))
+logo_image = logo_image.resize((400, 299))
 logo_tk = ImageTk.PhotoImage(logo_image)
 
 # Mostrar el logo en un widget Label sin borde y ajustar el tamaño del Label
 logo_label = tk.Label(root, image=logo_tk, bg="#192440", bd=0)
 logo_label.config(width=400, height=400)
-logo_label.pack(pady=10)
+logo_label.pack()
 
 mostrarLabelCarga()
 
+root.after(5000,mostrarGanador)
+
 # Crear etiqueta para mostrar el ganador
-etiqueta_ganador = tk.Label(root, text="¿Están listos para una Feliz Navidad?", font=("Helvetica", 20), bg="#192440", fg="white")
-etiqueta_ganador.pack(pady=10)
+etiqueta_ganador = tk.Label(root, text="", font=("Helvetica", 20), bg="#192440", fg="white")
+etiqueta_ganador.pack(pady=5)
 
 # Crear etiqueta para mostrar el regalo
 etiqueta_regalo = tk.Label(root, text="", font=("Helvetica", 20), bg="#192440", fg="white")
-etiqueta_regalo.pack(pady=10)
+etiqueta_regalo.pack(pady=5)
 
 # Utilizar un estilo temático para los botones
 style = ttk.Style()
@@ -184,6 +190,9 @@ boton_reiniciarIndice.pack(side=tk.LEFT, padx=10)
 # Botón para mostrar el ganador actual
 boton_mostrarGanador = ttk.Button(botones_frame, text="Siguiente Ganador", command=mostrarGanador)
 boton_mostrarGanador.pack(side=tk.LEFT, padx=10)
+
+boton_salir = ttk.Button(botones_frame, text="Salir", command=salir)
+boton_salir.pack(pady=10)
 
 # Configurar el logo en la ventana principal
 root.tk.call('wm', 'iconphoto', root._w, logo_tk)
