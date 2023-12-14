@@ -1,0 +1,36 @@
+import pandas as pd
+import numpy as np
+
+df1 = pd.read_excel("Insumo Rifa HLS 2023.xlsx", sheet_name="Nomina")
+df2 = pd.read_excel("Insumo Rifa HLS 2023.xlsx", sheet_name="Regalos")
+
+hoy = pd.to_datetime("today")
+df1["Fecha"] = pd.to_datetime(df1["Fecha"], format="%d/%m/%Y")
+df1["Fecha"] = df1["Fecha"].replace("", "NA").replace("NA", pd.NA)
+df1["Fecha"] = pd.to_datetime(df1["Fecha"], errors="coerce")
+df1["Tiempo_en_empresa"] = (hoy - df1["Fecha"]).dt.days
+
+df_combinado = pd.merge(df1, df2, left_on="ID", right_on="Id")
+
+regalos_asignados = []
+
+for index, row in df_combinado.iterrows():
+    disponible_regalos = df_combinado[df_combinado["Valor"] == row["Valor"]]["Regalo"].tolist()
+    regalos_sin_asignar = list(set(disponible_regalos) - set(regalos_asignados))
+
+    if regalos_sin_asignar:
+        if row["Tiempo_en_empresa"] >= (3 * 365):  # 3 años o más
+            regalo_asignado = np.random.choice(regalos_sin_asignar)
+        elif row["Tiempo_en_empresa"] <= (3 * 365) and row["Tiempo_en_empresa"] >= (2 * 365):  # Entre 2 y 3 años
+            regalo_asignado = np.random.choice(regalos_sin_asignar)
+        elif row["Tiempo_en_empresa"] >= 365:  # Entre 1 y 2 años
+            regalo_asignado = np.random.choice(regalos_sin_asignar)
+    else:
+        regalo_asignado = "Sin Regalo"
+
+    regalos_asignados.append(regalo_asignado)
+    df_combinado.at[index, "Regalo_asignado"] = regalo_asignado
+
+# Visualizar los resultados
+print(df_combinado[["ID", "Nombre", "Tiempo_en_empresa", "Regalo_asignado"]])
+df_combinado[["ID", "Nombre", "Tiempo_en_empresa", "Regalo_asignado","Valor"]].to_excel("Resultados Rifa HLS 2023.xlsx", index=False)
